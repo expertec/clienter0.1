@@ -1,0 +1,17 @@
+# Node.js
+node_modules/
+dist/
+
+# Firebase credentials
+backend/firebase-credentials.json
+
+# Logs
+*.log
+
+# Sistema
+.DS_Store
+
+# Environment variables
+.env
+backend/firebase-credentials.json
+node_modules/
