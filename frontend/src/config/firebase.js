@@ -15,10 +15,11 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
-const firestore = getFirestore(app); 
+const db = getFirestore(app); // Solo una instancia de Firestore
+export { auth, db }; // No es necesario exportar `firestore` con otro nombre
 
-export { auth, db, firestore };
+
+
 
    
    

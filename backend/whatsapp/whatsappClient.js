@@ -3,6 +3,8 @@ const admin = require('firebase-admin');
 const QRCode = require('qrcode');
 const Pino = require('pino');
 const path = require('path');
+const { handleIncomingMessage } = require('../handlers/messageReceiver'); // Archivo que gestiona recepción
+const { sendMessageToContact } = require('../handlers/messageSender'); // Archivo que gestiona envío
 
 // Inicializar Firebase Admin si no está inicializado
 if (!admin.apps.length) {
@@ -24,11 +26,10 @@ async function connectToWhatsApp(companyId) {
   console.log(`Iniciando conexión para la empresa: ${companyId}`);
   const sessionRef = db.collection('companySessions').doc(companyId);
 
-  // Obtener credenciales desde Firestore
   const authFolderPath = path.resolve(__dirname, `../auth/${companyId}`);
   const { state, saveCreds } = await useMultiFileAuthState(authFolderPath);
-
   const { version } = await fetchLatestBaileysVersion();
+
   const sock = makeWASocket({
     auth: state,
     logger: Pino({ level: 'info' }),
@@ -39,7 +40,7 @@ async function connectToWhatsApp(companyId) {
 
   sock.ev.on('connection.update', async (update) => {
     const { connection, lastDisconnect, qr } = update;
-  
+
     try {
       if (qr) {
         const qrCodeUrl = await QRCode.toDataURL(qr);
@@ -47,17 +48,17 @@ async function connectToWhatsApp(companyId) {
         await sessionRef.set({ qr: qrCodeUrl, status: 'qr' }, { merge: true });
         console.log(`QR generado para ${companyId}`);
       }
-  
+
       if (connection === 'open') {
         console.log(`Conexión exitosa para ${companyId}`);
         qrCodes[companyId] = null;
-  
+
         const phoneNumber = sock?.user?.id.split('@')[0];
         if (phoneNumber) {
           phoneNumbers[companyId] = phoneNumber;
           console.log(`Número de teléfono para ${companyId}: ${phoneNumber}`);
         }
-  
+
         await sessionRef.set({ status: 'connected', qr: null }, { merge: true });
       } else if (connection === 'close') {
         const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== 401;
@@ -73,16 +74,50 @@ async function connectToWhatsApp(companyId) {
       console.error(`Error en la conexión de ${companyId}:`, error);
     }
   });
-  
 
   sock.ev.on('creds.update', saveCreds);
 
-  sock.ev.on('messages.upsert', (message) => {
-    console.log(`Mensaje recibido:`, message);
-    // Aquí puedes manejar los mensajes entrantes.
+  // Manejar mensajes entrantes
+  sock.ev.on('messages.upsert', async (message) => {
+    console.log(`Mensaje recibido para ${companyId}:`, message);
+
+    if (!message || !message.messages || message.messages.length === 0) {
+      console.warn('⚠️ Mensaje vacío recibido o estructura incorrecta.');
+      return;
+    }
+
+    const msg = message.messages[0];
+    const contactId = msg.key.remoteJid.split('@')[0]; // Número del cliente
+
+    if (msg.key.fromMe) return; // Ignorar los mensajes enviados por la empresa misma
+
+    try {
+      // Validar si `handleIncomingMessage` es una función
+      if (typeof handleIncomingMessage !== 'function') {
+        throw new Error('❌ handleIncomingMessage no es una función válida. Verifica la importación.');
+      }
+
+      await handleIncomingMessage(companyId, contactId, message); // Llamada al manejador de recepción
+      console.log(`✅ Mensaje entrante guardado para el contacto ${contactId} de la empresa ${companyId}`);
+    } catch (error) {
+      console.error(`❌ Error al manejar el mensaje de ${contactId}:`, error);
+    }
   });
 
   return sock;
+}
+
+/**
+ * Obtener cliente de WhatsApp para enviar mensajes.
+ * @param {string} companyId - ID de la empresa.
+ * @returns {object|null} Instancia de Baileys o null si no existe.
+ */
+function getWhatsAppClient(companyId) {
+  if (sockets[companyId]) {
+    return sockets[companyId]; // Retornar el cliente activo de Baileys
+  }
+  console.warn(`No se encontró una sesión activa para la empresa ${companyId}`);
+  return null;
 }
 
 /**
@@ -134,5 +169,7 @@ module.exports = {
   getWhatsAppStatus,
   getCurrentQrCode,
   initializeWhatsAppConnections,
-  getPhoneNumber, // Exportar la función para obtener el número de teléfono
+  getPhoneNumber,
+  sockets,
+  getWhatsAppClient, // Asegúrate de exportar esta función
 };

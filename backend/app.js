@@ -3,13 +3,13 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const admin = require('firebase-admin');
-
+const { sendMessageToContact } = require('./handlers/messageHandler'); // Importar la nueva función para enviar mensajes
 const {
   connectToWhatsApp,
   getWhatsAppStatus,
   getCurrentQrCode,
   initializeWhatsAppConnections,
-  getPhoneNumber, // Importar la función para obtener el número de teléfono
+  getPhoneNumber,
 } = require('./whatsapp/whatsappClient');
 
 // Inicializar Firebase Admin
@@ -48,6 +48,7 @@ app.get('/', (req, res) => {
   res.send('API del Backend del CRM');
 });
 
+// Endpoint para obtener el QR de WhatsApp
 app.get('/api/whatsapp/:companyId/qr', async (req, res) => {
   const { companyId } = req.params;
 
@@ -71,6 +72,24 @@ app.get('/api/whatsapp/:companyId/qr', async (req, res) => {
   }
 });
 
+// Endpoint para enviar un mensaje desde el CRM
+app.post('/api/messages/send', async (req, res) => {
+  const { businessId, contactId, content } = req.body;
+
+  if (!businessId || !contactId || !content) {
+    return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+  }
+
+  try {
+    await sendMessageToContact(businessId, contactId, content);
+    res.status(200).json({
+      message: 'Mensaje enviado correctamente',
+    });
+  } catch (error) {
+    console.error('Error al enviar el mensaje:', error);
+    res.status(500).json({ error: 'Error al enviar el mensaje. Intenta nuevamente.' });
+  }
+});
 
 // Endpoint para obtener el companyId asociado al usuario
 app.get('/api/users/:userId', async (req, res) => {
