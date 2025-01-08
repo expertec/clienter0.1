@@ -1,53 +1,70 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./hooks/useAuth";
 import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
+import RegisterPage from "./pages/RegisterPage"; // Importación del RegisterPage
+import MainLayout from "./components/MainLayout";
 import AdminDashboard from "./pages/AdminDashboard";
 import AgentDashboard from "./pages/AgentDashboard";
-import ConversationsPage from "./pages/ConversationsPage";
-import MainLayout from "./components/MainLayout";
 import AdminHome from "./pages/AdminHome";
+import ConversationsPage from "./pages/ConversationsPage";
 import SettingsPage from "./pages/SettingsPage";
-import ProtectedRoute from "./components/ProtectedRoute"; // Asegúrate de tener este componente implementado
 
+const ProtectedRoute = ({ children, role }) => {
+  const { user, role: userRole } = useAuth();
 
-function App() {
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
+  if (role && userRole !== role) {
+    return <Navigate to={`/${userRole}`} />;
+  }
+
+  return children;
+};
+
+const App = () => {
   return (
     <Router>
       <Routes>
-        {/* Ruta para el Login */}
-        <Route path="/" element={<LoginPage />} />
+        {/* Ruta de inicio de sesión */}
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* Ruta de registro */}
         <Route path="/register" element={<RegisterPage />} />
 
         {/* Rutas protegidas con el MainLayout */}
-        <Route 
-          path="/admin" 
+        <Route
+          path="/admin"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute role="admin">
               <MainLayout />
             </ProtectedRoute>
           }
         >
-          {/* Subrutas de admin */}
           <Route index element={<AdminHome />} />
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="conversations" element={<ConversationsPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
 
-        <Route 
-          path="/agent" 
+        {/* Ruta protegida para agentes */}
+        <Route
+          path="/agent"
           element={
-            <ProtectedRoute>
-              <MainLayout />
+            <ProtectedRoute role="agent">
+              <AgentDashboard />
             </ProtectedRoute>
           }
-        >
-          {/* Subrutas de agent */}
-          <Route index element={<AgentDashboard />} />
-        </Route>
+        />
+
+        {/* Redirección desde la raíz */}
+        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </Router>
   );
-}
+};
 
 export default App;

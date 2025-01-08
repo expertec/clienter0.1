@@ -57,47 +57,69 @@ const RegisterPage = () => {
   };
 
   return (
-    <div>
-      <h1>Registro</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Nombre</label>
-          <input
-            type="text"
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            placeholder="Ingresa tu nombre"
-            required
-          />
-        </div>
-        <div>
-          <label>Email</label>
-          <input
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            placeholder="Ingresa tu email"
-            required
-          />
-        </div>
-        <div>
-          <label>Contraseña</label>
-          <input
-            type="password"
-            name="password"
-            value={form.password}
-            onChange={handleChange}
-            placeholder="Ingresa tu contraseña"
-            required
-          />
-        </div>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <button type="submit" disabled={loading}>
-          {loading ? "Registrando..." : "Registrarse"}
-        </button>
-      </form>
+    <div className="flex min-h-screen bg-gray-50 items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md">
+        <h1 className="text-2xl font-bold text-center text-gray-900">Registro de Cuenta</h1>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="rounded-md shadow-sm space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Nombre</label>
+              <input
+                type="text"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                placeholder="Ingresa tu nombre"
+                required
+                className="appearance-none rounded-lg border border-gray-300 p-2 w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="Ingresa tu email"
+                required
+                className="appearance-none rounded-lg border border-gray-300 p-2 w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Contraseña</label>
+              <input
+                type="password"
+                name="password"
+                value={form.password}
+                onChange={handleChange}
+                placeholder="Ingresa tu contraseña"
+                required
+                className="appearance-none rounded-lg border border-gray-300 p-2 w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          {error && <p className="text-red-500 text-center">{error}</p>}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-white text-sm font-medium ${
+              loading ? "bg-blue-300" : "bg-blue-600 hover:bg-blue-700"
+            } focus:outline-none`}
+          >
+            {loading ? "Registrando..." : "Registrarse"}
+          </button>
+        </form>
+
+        <p className="text-center text-sm text-gray-500 mt-4">
+          ¿Ya tienes una cuenta?{" "}
+          <a href="/login" className="text-blue-600 hover:text-blue-800 font-semibold">
+            Inicia sesión
+          </a>
+        </p>
+      </div>
     </div>
   );
 };

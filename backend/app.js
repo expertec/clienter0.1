@@ -11,6 +11,7 @@ const {
   initializeWhatsAppConnections,
   getPhoneNumber,
 } = require('./whatsapp/whatsappClient');
+const agentRoutes = require('./routes/agentRoutes'); // Importar las rutas para manejar agentes
 
 // Inicializar Firebase Admin
 if (!admin.apps.length) {
@@ -91,6 +92,39 @@ app.post('/api/messages/send', async (req, res) => {
   }
 });
 
+// Endpoint para obtener el plan de la empresa
+app.get('/api/companies/:companyId/plan', async (req, res) => {
+  const { companyId } = req.params;
+
+  try {
+    const companyDoc = await db.collection('companies').doc(companyId).get();
+    if (!companyDoc.exists) {
+      return res.status(404).json({ error: 'Empresa no encontrada.' });
+    }
+
+    const companyData = companyDoc.data();
+    const agents = companyData.agents || []; // Array con los IDs de los agentes
+    const planId = companyData.planId;
+
+    // Consultar detalles del plan
+    const planDoc = await db.collection('plans').doc(planId).get();
+    if (!planDoc.exists) {
+      return res.status(404).json({ error: 'Plan no encontrado.' });
+    }
+
+    const planData = planDoc.data();
+
+    res.status(200).json({
+      plan: planData.name,
+      maxAgents: planData.maxAgents,
+      currentAgents: agents.length,
+    });
+  } catch (error) {
+    console.error('Error al obtener información del plan:', error);
+    res.status(500).json({ error: 'Error al obtener información del plan. Intenta nuevamente.' });
+  }
+});
+
 // Endpoint para obtener el companyId asociado al usuario
 app.get('/api/users/:userId', async (req, res) => {
   const { userId } = req.params;
@@ -127,6 +161,13 @@ app.post('/api/register', async (req, res) => {
 
     const userId = userRecord.uid;
 
+    // Obtener el ID del plan Freemium desde la base de datos
+    const freemiumPlanDoc = await db.collection('plans').where('name', '==', 'Freemium').limit(1).get();
+    if (freemiumPlanDoc.empty) {
+      return res.status(500).json({ error: 'No se encontró el plan Freemium.' });
+    }
+    const freemiumPlanId = freemiumPlanDoc.docs[0].id;
+
     await db.collection('users').doc(userId).set({
       name,
       email,
@@ -134,8 +175,9 @@ app.post('/api/register', async (req, res) => {
     });
 
     await db.collection('companies').doc(userId).set({
-      plan: 'freemium',
+      planId: freemiumPlanId,
       ownerUserId: userId,
+      agents: [],
     });
 
     await connectToWhatsApp(userId);
@@ -171,7 +213,7 @@ app.get('/api/whatsapp/:companyId/phone', async (req, res) => {
   const { companyId } = req.params;
 
   try {
-    const phoneNumber = getPhoneNumber(companyId); // Usar la función para obtener el número de teléfono
+    const phoneNumber = getPhoneNumber(companyId);
     if (!phoneNumber) {
       return res.status(404).json({ error: 'No se pudo obtener el número de teléfono.' });
     }
@@ -182,6 +224,9 @@ app.get('/api/whatsapp/:companyId/phone', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener el número de teléfono.' });
   }
 });
+
+// Agregar rutas para agentes
+app.use('/api/agents', agentRoutes);
 
 // Inicializar conexiones de WhatsApp al iniciar el servidor
 (async () => {
