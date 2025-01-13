@@ -12,6 +12,8 @@ const {
   getPhoneNumber,
 } = require('./whatsapp/whatsappClient');
 const agentRoutes = require('./routes/agentRoutes'); // Importar las rutas para manejar agentes
+const sequenceRoutes = require('./routes/sequenceRoutes'); // Importar rutas de secuencias
+const uploadRoutes = require('./routes/uploadRoutes'); // Importar rutas de subida de archivos
 
 // Inicializar Firebase Admin
 if (!admin.apps.length) {
@@ -23,7 +25,8 @@ if (!admin.apps.length) {
     }
 
     admin.initializeApp({
-      credential: admin.credential.cert(require(serviceAccountPath)),
+      credential: admin.credential.cert(require('./firebase-credentials.json')),
+      storageBucket: 'clienter-df7a5.firebasestorage.app',
     });
 
     console.log('Firebase Admin inicializado correctamente.');
@@ -43,6 +46,9 @@ const PORT = process.env.PORT || 3000;
 // Middlewares
 app.use(cors());
 app.use(bodyParser.json());
+app.use('/api/sequences', sequenceRoutes); // Agregar rutas de secuencias
+app.use('/api/upload', uploadRoutes); // Agregar ruta de subida de archivos
+app.use('/api/agents', agentRoutes); // Rutas para agentes
 
 // Rutas API
 app.get('/', (req, res) => {
@@ -96,6 +102,10 @@ app.post('/api/messages/send', async (req, res) => {
 app.get('/api/companies/:companyId/plan', async (req, res) => {
   const { companyId } = req.params;
 
+  if (!companyId || companyId.trim() === '') {
+    return res.status(400).json({ error: 'El ID del negocio es obligatorio.' });
+  }
+
   try {
     const companyDoc = await db.collection('companies').doc(companyId).get();
     if (!companyDoc.exists) {
@@ -124,6 +134,7 @@ app.get('/api/companies/:companyId/plan', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener información del plan. Intenta nuevamente.' });
   }
 });
+
 
 // Endpoint para obtener el companyId asociado al usuario
 app.get('/api/users/:userId', async (req, res) => {
@@ -224,9 +235,6 @@ app.get('/api/whatsapp/:companyId/phone', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener el número de teléfono.' });
   }
 });
-
-// Agregar rutas para agentes
-app.use('/api/agents', agentRoutes);
 
 // Inicializar conexiones de WhatsApp al iniciar el servidor
 (async () => {

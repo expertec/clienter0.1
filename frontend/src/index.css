@@ -2,6 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-primary: #083416;
+  --color-secondary: #9AE26E;
+  --color-background: #F4FDF3;
+  --color-text: #083416;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+.button {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.button:hover {
+  background-color: var(--color-secondary);
+}
+
+
+
 
 body {
   margin: 0;
@@ -15,4 +38,12 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+.audio-recorder {
+  border: 1px solid #e5e7eb;
+}
+
+.audio-recorder .waveform-bar {
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
 }

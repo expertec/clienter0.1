@@ -19,7 +19,6 @@ const SettingsPage = () => {
   const [agents, setAgents] = useState([]); // Lista de agentes
   const [plan, setPlan] = useState({ plan: '', maxAgents: 0, currentAgents: 0 }); // Estado del plan
 
-  // Obtener información del usuario autenticado
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -29,17 +28,15 @@ const SettingsPage = () => {
           return;
         }
         setUserId(user.uid);
-        setCompanyId(user.uid); // Suponiendo que userId es igual al companyId
+        setCompanyId(user.uid);
       } catch (error) {
         console.error('Error al obtener los datos del usuario:', error);
         setError('No se pudo cargar la información del usuario.');
       }
     };
-
     fetchUserData();
   }, []);
 
-  // Obtener el estado de WhatsApp
   useEffect(() => {
     if (!companyId) return;
 
@@ -71,7 +68,6 @@ const SettingsPage = () => {
     fetchStatus();
   }, [companyId]);
 
-  // Obtener información del plan
   useEffect(() => {
     const fetchPlanData = async () => {
       if (!companyId) return;
@@ -88,7 +84,6 @@ const SettingsPage = () => {
     fetchPlanData();
   }, [companyId]);
 
-  // Obtener agentes
   useEffect(() => {
     const fetchAgents = async () => {
       if (!companyId) return;
@@ -149,32 +144,36 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow">
-      <h1 className="text-2xl font-bold mb-6">Configuración</h1>
+    <div className="p-6 bg-primary-light rounded-lg shadow">
+      <h1 className="text-3xl font-extrabold text-primary mb-6">Configuración</h1>
 
-      <div className="border-b border-gray-200">
+      <div className="border-b border-secondary-dark">
         <nav className="flex space-x-4">
           <button
-            className={`px-4 py-2 font-semibold ${
-              activeTab === 'whatsapp' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'
+            className={`px-4 py-2 font-semibold rounded-md ${
+              activeTab === 'whatsapp'
+                ? 'text-secondary-dark bg-secondary-light border-b-4 border-secondary-dark'
+                : 'text-gray-600 hover:text-primary'
             }`}
             onClick={() => setActiveTab('whatsapp')}
           >
             WhatsApp
           </button>
-
           <button
-            className={`px-4 py-2 font-semibold ${
-              activeTab === 'agents' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'
+            className={`px-4 py-2 font-semibold rounded-md ${
+              activeTab === 'agents'
+                ? 'text-secondary-dark bg-secondary-light border-b-4 border-secondary-dark'
+                : 'text-gray-600 hover:text-primary'
             }`}
             onClick={() => setActiveTab('agents')}
           >
             Agentes
           </button>
-
           <button
-            className={`px-4 py-2 font-semibold ${
-              activeTab === 'plan' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'
+            className={`px-4 py-2 font-semibold rounded-md ${
+              activeTab === 'plan'
+                ? 'text-secondary-dark bg-secondary-light border-b-4 border-secondary-dark'
+                : 'text-gray-600 hover:text-primary'
             }`}
             onClick={() => setActiveTab('plan')}
           >
@@ -186,43 +185,50 @@ const SettingsPage = () => {
       <div className="mt-6">
         {activeTab === 'whatsapp' && (
           <div>
-            <h2 className="text-xl font-bold">Configuración de WhatsApp</h2>
-            <p><strong>Estado de WhatsApp:</strong> {whatsappStatus}</p>
-            {qrCode && <img src={qrCode} alt="Código QR de WhatsApp" />}
-            {!qrCode && whatsappStatus === 'connected' && <p>WhatsApp conectado: {phoneNumber}</p>}
+            <h2 className="text-xl font-bold text-primary-dark">Configuración de WhatsApp</h2>
+            <p>
+              <strong className="text-secondary">Estado de WhatsApp:</strong> {whatsappStatus}
+            </p>
+            {qrCode && <img src={qrCode} alt="Código QR de WhatsApp" className="mx-auto mt-4 shadow-lg rounded-md" />}
+            {!qrCode && whatsappStatus === 'connected' && (
+              <p className="text-primary mt-4">WhatsApp conectado: {phoneNumber}</p>
+            )}
           </div>
         )}
 
         {activeTab === 'agents' && (
           <div>
-            <h2 className="text-xl font-bold">Gestión de Agentes</h2>
+            <h2 className="text-xl font-bold text-primary-dark">Gestión de Agentes</h2>
             <button
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                       className="px-5 py-3 bg-primary text-white rounded-lg shadow hover:bg-secondary transition duration-300"
+
               onClick={() => setShowAgentModal(true)}
             >
               + Crear Nuevo Agente
             </button>
 
             <div className="mt-6">
-              <table className="w-full">
-                <thead>
+              <table className="w-full border border-gray-300 rounded-md">
+                <thead className="bg-primary-lightest">
                   <tr>
-                    <th>Nombre</th>
-                    <th>Correo</th>
-                    <th>Acciones</th>
+                    <th className="p-3">Nombre</th>
+                    <th className="p-3">Correo</th>
+                    <th className="p-3">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {agents.length === 0 ? (
                     <tr>
-                      <td colSpan="3" className="text-center">No hay agentes registrados.</td>
+                      <td colSpan="3" className="text-center text-secondary-dark">
+                        No hay agentes registrados.
+                      </td>
                     </tr>
                   ) : (
                     agents.map((agent) => (
-                      <tr key={agent.id}>
-                        <td>{agent.name}</td>
-                        <td>{agent.email}</td>
-                        <td>
+                      <tr key={agent.id} className="hover:bg-primary-lightest">
+                        <td className="p-3">{agent.name}</td>
+                        <td className="p-3">{agent.email}</td>
+                        <td className="p-3">
                           <button
                             className="text-red-600 hover:underline"
                             onClick={() => handleDeleteAgent(agent.id)}
@@ -237,41 +243,40 @@ const SettingsPage = () => {
               </table>
             </div>
 
-            {/* Modal de creación de agentes */}
             {showAgentModal && (
               <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
-                <div className="bg-white rounded-lg p-6 w-1/3">
-                  <h3 className="text-xl font-semibold mb-4">Crear Agente</h3>
+                <div className="bg-white rounded-lg p-6 w-1/3 shadow-lg">
+                  <h3 className="text-xl font-semibold mb-4 text-primary-dark">Crear Agente</h3>
                   {errorMessage && <p className="text-red-500">{errorMessage}</p>}
                   {successMessage && <p className="text-green-500">{successMessage}</p>}
                   <form onSubmit={handleCreateAgent}>
                     <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700">Nombre</label>
+                      <label className="block text-sm font-medium text-secondary-dark">Nombre</label>
                       <input
                         type="text"
                         value={agentName}
                         onChange={(e) => setAgentName(e.target.value)}
-                        className="mt-1 p-2 border rounded-lg w-full"
+                        className="mt-1 p-2 border rounded-lg w-full focus:ring focus:ring-secondary-light"
                         placeholder="Nombre del agente"
                       />
                     </div>
                     <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700">Correo electrónico</label>
+                      <label className="block text-sm font-medium text-secondary-dark">Correo electrónico</label>
                       <input
                         type="email"
                         value={agentEmail}
                         onChange={(e) => setAgentEmail(e.target.value)}
-                        className="mt-1 p-2 border rounded-lg w-full"
+                        className="mt-1 p-2 border rounded-lg w-full focus:ring focus:ring-secondary-light"
                         placeholder="Correo del agente"
                       />
                     </div>
                     <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700">Contraseña</label>
+                      <label className="block text-sm font-medium text-secondary-dark">Contraseña</label>
                       <input
                         type="password"
                         value={agentPassword}
                         onChange={(e) => setAgentPassword(e.target.value)}
-                        className="mt-1 p-2 border rounded-lg w-full"
+                        className="mt-1 p-2 border rounded-lg w-full focus:ring focus:ring-secondary-light"
                         placeholder="Contraseña"
                       />
                     </div>
@@ -283,7 +288,7 @@ const SettingsPage = () => {
                       >
                         Cancelar
                       </button>
-                      <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-lg">
+                      <button type="submit" className="px-4 py-2 bg-secondary text-white rounded-lg">
                         Crear
                       </button>
                     </div>
@@ -296,11 +301,21 @@ const SettingsPage = () => {
 
         {activeTab === 'plan' && (
           <div>
-            <h2 className="text-xl font-bold">Plan Actual</h2>
-            <p><strong>Plan:</strong> {plan.plan}</p>
-            <p><strong>Agentes permitidos:</strong> {plan.maxAgents}</p>
-            <p><strong>Agentes actuales:</strong> {plan.currentAgents}</p>
-            <button className="mt-4 px-4 py-2 bg-green-500 text-white rounded-lg">Actualizar Plan</button>
+            <h2 className="text-xl font-bold text-primary-dark">Plan Actual</h2>
+
+            <p>
+              <strong>Plan:</strong> {plan.plan}
+            </p>
+            <p>
+              <strong>Agentes permitidos:</strong> {plan.maxAgents}
+            </p>
+            <p>
+              <strong>Agentes actuales:</strong> {plan.currentAgents}
+            </p>
+            <button                       className="px-5 py-3 bg-primary text-white rounded-lg shadow hover:bg-secondary transition duration-300"
+            >
+              Actualizar Plan
+            </button>
           </div>
         )}
       </div>

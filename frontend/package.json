@@ -9,9 +9,12 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.4.0",
+    "react-media-recorder": "^1.7.1",
     "react-router-dom": "^7.1.0",
     "react-scripts": "5.0.1",
+    "simple-audio-recorder": "^1.2.4",
     "socket.io-client": "^4.8.1",
+    "wavesurfer.js": "^7.8.15",
     "web-vitals": "^4.2.4"
   },
   "scripts": {

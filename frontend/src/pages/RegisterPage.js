@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { signInWithCustomToken } from "firebase/auth"; // Importar función de autenticación
 import { auth } from "../config/firebase"; // Tu configuración de Firebase
+import logo from "../assets/logo.png"; // Importar el logo
 
 const RegisterPage = () => {
   const [form, setForm] = useState({
@@ -57,13 +58,18 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50 items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen bg-gradient-to-b from-white to-primary items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold text-center text-gray-900">Registro de Cuenta</h1>
+        {/* Logo */}
+        <div className="flex justify-center mb-6">
+          <img src={logo} alt="Logo" className="w-24 h-24" />
+        </div>
+
+        <h1 className="text-2xl font-bold text-center text-primary">Registro de Cuenta</h1>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Nombre</label>
+              <label className="block text-sm font-medium text-primary">Nombre</label>
               <input
                 type="text"
                 name="name"
@@ -71,11 +77,11 @@ const RegisterPage = () => {
                 onChange={handleChange}
                 placeholder="Ingresa tu nombre"
                 required
-                className="appearance-none rounded-lg border border-gray-300 p-2 w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="appearance-none rounded-lg border border-gray-300 p-2 w-full focus:outline-none focus:ring-secondary focus:border-secondary"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Email</label>
+              <label className="block text-sm font-medium text-primary">Email</label>
               <input
                 type="email"
                 name="email"
@@ -83,11 +89,11 @@ const RegisterPage = () => {
                 onChange={handleChange}
                 placeholder="Ingresa tu email"
                 required
-                className="appearance-none rounded-lg border border-gray-300 p-2 w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="appearance-none rounded-lg border border-gray-300 p-2 w-full focus:outline-none focus:ring-secondary focus:border-secondary"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Contraseña</label>
+              <label className="block text-sm font-medium text-primary">Contraseña</label>
               <input
                 type="password"
                 name="password"
@@ -95,7 +101,7 @@ const RegisterPage = () => {
                 onChange={handleChange}
                 placeholder="Ingresa tu contraseña"
                 required
-                className="appearance-none rounded-lg border border-gray-300 p-2 w-full focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="appearance-none rounded-lg border border-gray-300 p-2 w-full focus:outline-none focus:ring-secondary focus:border-secondary"
               />
             </div>
           </div>
@@ -106,7 +112,7 @@ const RegisterPage = () => {
             type="submit"
             disabled={loading}
             className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-white text-sm font-medium ${
-              loading ? "bg-blue-300" : "bg-blue-600 hover:bg-blue-700"
+              loading ? "bg-secondary cursor-not-allowed" : "bg-primary hover:bg-secondary"
             } focus:outline-none`}
           >
             {loading ? "Registrando..." : "Registrarse"}
@@ -115,7 +121,7 @@ const RegisterPage = () => {
 
         <p className="text-center text-sm text-gray-500 mt-4">
           ¿Ya tienes una cuenta?{" "}
-          <a href="/login" className="text-blue-600 hover:text-blue-800 font-semibold">
+          <a href="/login" className="text-primary hover:text-secondary font-semibold">
             Inicia sesión
           </a>
         </p>

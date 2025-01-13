@@ -106,43 +106,43 @@ const ConversationsPage = () => {
   };
 
   return (
-    <div className="h-screen flex">
+    <div className="h-screen flex bg-gradient-to-b from-primary-light to-white">
       {/* Sidebar */}
-      <div className="w-1/3 bg-gray-100 border-r overflow-y-auto">
-        <div className="p-4 text-2xl font-semibold text-center">Conversaciones</div>
+      <div className="w-1/3 bg-secondary-light border-r overflow-y-auto">
+        <div className="p-4 text-2xl font-semibold text-primary text-center">Conversaciones</div>
         <div className="flex-1">
           {contacts.length ? (
             contacts.map((contact) => (
               <div
                 key={contact.contactId}
                 onClick={() => setSelectedContact(contact)}
-                className={`p-4 cursor-pointer hover:bg-gray-200 ${
-                  selectedContact?.contactId === contact.contactId ? "bg-gray-300" : ""
+                className={`p-4 cursor-pointer rounded-lg hover:bg-primary-lightest ${
+                  selectedContact?.contactId === contact.contactId ? "bg-primary-light" : ""
                 }`}
               >
-                <p className="font-bold">📱 {contact.contactId}</p>
-                <p className="text-sm text-gray-500 truncate">
+                <p className="font-bold text-secondary-dark">📱 {contact.contactId}</p>
+                <p className="text-sm text-secondary-dark truncate">
                   {contact.lastMessage || "Sin mensajes aún"}
                 </p>
               </div>
             ))
           ) : (
-            <p className="p-4 text-center text-gray-600">No se encontraron contactos</p>
+            <p className="p-4 text-center text-secondary-dark">No se encontraron contactos</p>
           )}
         </div>
       </div>
 
       {/* Panel de chat */}
-      <div className="w-2/3 flex flex-col bg-white">
+      <div className="w-2/3 flex flex-col bg-white rounded-lg shadow-inner">
         {selectedContact ? (
           <>
             {/* Header */}
-            <div className="p-4 bg-gray-100 border-b">
-              <h2 className="text-lg font-bold">Chat con: {selectedContact.contactId}</h2>
+            <div className="p-4 bg-primary-light border-b">
+              <h2 className="text-lg font-bold text-primary">Chat con: {selectedContact.contactId}</h2>
             </div>
 
             {/* Mensajes */}
-            <div className="flex-1 p-4 overflow-y-auto space-y-4">
+            <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-gray-50">
               {messages.length ? (
                 messages.map((msg, index) => (
                   <div
@@ -154,7 +154,7 @@ const ConversationsPage = () => {
                     <div
                       className={`p-3 rounded-lg shadow-sm ${
                         msg.sender === "business"
-                          ? "bg-blue-100 text-blue-700"
+                          ? "bg-secondary text-white"
                           : "bg-gray-200 text-gray-800"
                       }`}
                     >
@@ -168,21 +168,21 @@ const ConversationsPage = () => {
             </div>
 
             {/* Input para enviar mensaje */}
-            <div className="p-4 border-t bg-gray-100">
+            <div className="p-4 border-t bg-primary-lightest">
               <div className="flex items-center space-x-2">
                 <input
                   type="text"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   placeholder="Escribe un mensaje..."
-                  className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                  className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring focus:ring-secondary-light"
                   disabled={isSending}
                 />
                 <button
                   onClick={handleSendMessage}
-                  className={`px-4 py-2 rounded-lg ${
-                    isSending ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"
-                  } text-white`}
+                  className={`px-4 py-2 rounded-lg text-white ${
+                    isSending ? "bg-secondary-light cursor-not-allowed" : "bg-primary hover:bg-secondary"
+                  }`}
                   disabled={isSending}
                 >
                   {isSending ? "Enviando..." : "Enviar"}

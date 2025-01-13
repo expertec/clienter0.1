@@ -9,6 +9,11 @@ import AgentDashboard from "./pages/AgentDashboard";
 import AdminHome from "./pages/AdminHome";
 import ConversationsPage from "./pages/ConversationsPage";
 import SettingsPage from "./pages/SettingsPage";
+import CampaignsPage from "./pages/marketing/CampaignsPage"; // Nueva página de Campañas
+import SequencesPage from "./pages/marketing/SequencesPage"; // Nueva página de Secuencias
+import MassSendingPage from "./pages/marketing/MassSendingPage"; // Nueva página de Envío Masivo
+import SequenceForm from "./pages/marketing/SequenceForm"; // Importación del formulario de secuencias
+import ContactsPage from "./pages/ContactsPage"; // Nueva página de Contactos
 
 const ProtectedRoute = ({ children, role }) => {
   const { user, role: userRole } = useAuth();
@@ -47,6 +52,15 @@ const App = () => {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="conversations" element={<ConversationsPage />} />
           <Route path="settings" element={<SettingsPage />} />
+
+          {/* Subrutas de Marketing */}
+          <Route path="marketing/campaigns" element={<CampaignsPage />} />
+          <Route path="marketing/sequences" element={<SequencesPage />} />
+          <Route path="marketing/mass-sending" element={<MassSendingPage />} />
+          <Route path="marketing/sequences/create" element={<SequenceForm />} />
+
+          {/* Ruta de Contactos */}
+          <Route path="contacts" element={<ContactsPage />} />
         </Route>
 
         {/* Ruta protegida para agentes */}

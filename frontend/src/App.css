@@ -1,3 +1,24 @@
+:root {
+  --color-primary: #083416;
+  --color-secondary: #9AE26E;
+  --color-background: #F4FDF3;
+  --color-text: #083416;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+.button {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.button:hover {
+  background-color: var(--color-secondary);
+}
+
 .App {
   text-align: center;
 }
